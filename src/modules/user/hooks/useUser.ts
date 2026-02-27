@@ -47,7 +47,7 @@ export default function useUser() {
   };
 
   const editUser = async (user: User) => {
-    const infoEditUser = omit(user, 'lastLocation', 'company');
+    const infoEditUser = omit(user, 'lastLocation', 'company', 'password');
     await editUserMutation(infoEditUser);
     if (errorEditUser)
       message.error('El usuario no se ha modificado exitosamente');

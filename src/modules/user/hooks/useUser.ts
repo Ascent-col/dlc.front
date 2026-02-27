@@ -9,6 +9,7 @@ import {
 } from '@/store/user/user.slice';
 import { NewUser, User } from '@/types';
 import { message } from 'antd';
+import { omit } from 'lodash';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -45,7 +46,8 @@ export default function useUser() {
     message.success('El estado de la compañía se actualizó correctamente');
   };
 
-  const editUser = async (infoEditUser: User) => {
+  const editUser = async (user: User) => {
+    const infoEditUser = omit(user, 'lastLocation', 'company', 'password');
     await editUserMutation(infoEditUser);
     if (errorEditUser)
       message.error('El usuario no se ha modificado exitosamente');

@@ -142,7 +142,7 @@ export default function useAlert({ currentUser }: { currentUser: User }) {
     try {
       onSelectAlert(id);
       // detailsNotication?.(false);
-      await changeAlertStatus({ id, status: 2 }).unwrap();
+      await changeAlertStatus({ id, status: 2 });
       await notifyAlertMobile(iduser, date);
     } catch (e) {
       message.error(

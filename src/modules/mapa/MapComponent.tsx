@@ -42,6 +42,10 @@ const MapComponent: FC<MapComponentProps> = ({
   const overlayRef = useRef<Overlay | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const vectorLayerRef = useRef<VectorLayer<any> | null>(null);
+  const sosOverlaysRef = useRef<globalThis.Map<number, Overlay>>(
+    new globalThis.Map(),
+  );
+
   const showPointsOnMap = (usersToShow: User[]) => {
     if (!mapInstance.current) {
       return;
@@ -72,16 +76,17 @@ const MapComponent: FC<MapComponentProps> = ({
           (nowMoment.getTime() - userDateTimeMoment.getTime()) / (1000 * 60) -
             userDateTimeMoment.getTimezoneOffset(),
         );
-        let iconSrc = '/recorrido/verde.png';
-        if (!user.hasAlert) {
-          if (minutesDiff > 240) {
-            iconSrc = '/recorrido/rojo.png';
-          } else if (minutesDiff > 5) {
-            iconSrc = '/recorrido/amarillo.png';
-          }
-        } else {
+
+        const previousOverlay = sosOverlaysRef.current.get(user.id);
+        if (previousOverlay) {
+          mapInstance.current?.removeOverlay(previousOverlay);
+          sosOverlaysRef.current.delete(user.id);
+        }
+
+        if (user.hasAlert) {
           const sosDiv = document.createElement('div');
           sosDiv.className = styles['sos-blink'];
+
           const sosOverlay = new Overlay({
             element: sosDiv,
             position: fromLonLat([
@@ -90,8 +95,35 @@ const MapComponent: FC<MapComponentProps> = ({
             ]),
             positioning: 'center-center',
           });
+
           mapInstance.current?.addOverlay(sosOverlay);
-          return null;
+          sosOverlaysRef.current.set(user.id, sosOverlay);
+
+          const point = new Feature({
+            geometry: new Point(
+              fromLonLat([lastlocation.longitude, lastlocation.latitude]),
+            ),
+          });
+
+          point.set('user', user);
+          point.setStyle(
+            new Style({
+              image: new Icon({
+                src: '/recorrido/rojo.png',
+                scale: 0.3,
+              }),
+            }),
+          );
+
+          return point;
+        }
+
+        let iconSrc = '/recorrido/verde.png';
+
+        if (minutesDiff > 240) {
+          iconSrc = '/recorrido/rojo.png';
+        } else if (minutesDiff > 5) {
+          iconSrc = '/recorrido/amarillo.png';
         }
 
         const point = new Feature({
@@ -99,6 +131,7 @@ const MapComponent: FC<MapComponentProps> = ({
             fromLonLat([lastlocation.longitude, lastlocation.latitude]),
           ),
         });
+
         point.set('user', user);
         point.setStyle(
           new Style({

@@ -30,6 +30,21 @@ export const userFeature = createSlice({
         state.users = action.payload;
       },
     );
+    builder.addMatcher(
+      userApiSlice.endpoints.editUser.matchFulfilled,
+      (state, action) => {
+        const userEdited = action.payload;
+        state.users = state.users.map((u) =>
+          u.id === userEdited.id
+            ? {
+                ...userEdited,
+                lastlocation: u.lastlocation,
+                company: u.company,
+              }
+            : u,
+        );
+      },
+    );
   },
 });
 

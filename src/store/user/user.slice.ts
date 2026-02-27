@@ -38,7 +38,7 @@ export const userApiSlice = userApi.injectEndpoints({
         body: data,
       }),
     }),
-    editUser: builder.mutation({
+    editUser: builder.mutation<User, Partial<User>>({
       query: (data: Partial<User>) => ({
         url: userConf.endpoints.editUser,
         method: 'PUT',

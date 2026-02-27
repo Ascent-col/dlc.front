@@ -3,6 +3,7 @@ import { Card } from 'antd';
 import type { User } from '@/types';
 import { isEqual } from 'lodash';
 import Image from 'next/image';
+import styles from '@/styles/MapComponent.module.css';
 
 type CardUserProps = {
   user: User;
@@ -34,7 +35,9 @@ const CardUser: React.FC<CardUserProps> = ({ user, onClick }) => {
 
   const isComplete = hasCompleteInfo(user.lastlocation);
 
-  if (isComplete) {
+  if (user.hasAlert) {
+    color = '';
+  } else if (isComplete) {
     const userDateTimeMoment = new Date(user.lastlocation.date);
     const nowMoment = new Date();
     const minutesDiff = Math.round(
@@ -57,13 +60,28 @@ const CardUser: React.FC<CardUserProps> = ({ user, onClick }) => {
       onClick={() => (lastLocationDate ? onClick(user) : null)}
       title={
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Image
-            src={color}
-            alt="Status"
-            width={20}
-            height={20}
-            style={{ marginRight: 8 }}
-          />
+          {}
+          {color === '' ? (
+            <div
+              className={styles['sos-blink']}
+              style={{
+                width: '15px',
+                height: '15px',
+                backgroundColor: 'red',
+                borderRadius: '50%',
+                marginRight: '10px',
+                marginLeft: '4px',
+              }}
+            />
+          ) : (
+            <Image
+              src={color}
+              alt="Status"
+              width={20}
+              height={20}
+              style={{ marginRight: 8 }}
+            />
+          )}
           {`${user.name} ${user.lastname}`}
         </div>
       }
@@ -86,7 +104,10 @@ const CardUser: React.FC<CardUserProps> = ({ user, onClick }) => {
           ? ` ${lastLocationDate.substring(11, 16)}`
           : ' Sin Información'}
       </p>
-      <p>Version Mobile: Sin Información</p>
+      <p>
+        Version Mobile:{' '}
+        {user.mobileVersion ? ` ${user.mobileVersion}` : ' Sin Información'}
+      </p>
     </Card>
   );
 };

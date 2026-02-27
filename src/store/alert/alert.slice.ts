@@ -28,9 +28,8 @@ export const alertApiSlice = alertApi.injectEndpoints({
     }),
     changeAlertStatus: builder.mutation({
       query: ({ id, status }: { id: number; status: number }) => ({
-        url: alertConf.endpoints.changeAlertStatus,
+        url: alertConf.endpoints.changeAlertStatus(id),
         method: 'PUT',
-        params: { id },
         body: { status },
       }),
     }),

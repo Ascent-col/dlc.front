@@ -53,7 +53,7 @@ export const alertFeature = createSlice({
       alertApiSlice.endpoints.changeAlertStatus.matchFulfilled,
       (state, action) => {
         state.alerts = state.alerts.map((alert) => {
-          return alert.id === action.payload[0].id
+          return alert?.id === action.payload[0]?.id
             ? {
                 ...alert,
                 status: action.payload[0].status,

@@ -74,6 +74,19 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
       timeZoneName: 'short',
     });
   };
+  const bellAnimation = `
+    @keyframes sirenFlash {
+      0% { color: #DB524A; text-shadow: 0 0 5px #DB524A; }
+      50% { color: #ff8b80, text-shadow: 0 0 15px #ff8b80; }
+      100% { color: #DB524A; text-shadow: 0 0 5px #DB524A; }
+    }`;
+  const bellIconStyle: CSSProperties = {
+    fontSize: '20px',
+    color: alertsNoRead.length > 0 ? '#DB524A' : '#ffffff',
+    animation:
+      alertsNoRead.length > 0 ? 'sirenFlash 1s infinite ease-in-out' : 'none',
+    transition: 'color 0.3s ease',
+  };
 
   const notificationMenu = (
     <Menu style={{ maxHeight: '30vh', overflowY: 'auto' }}>
@@ -163,6 +176,7 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
         },
       }}
     >
+      <style>{bellAnimation}</style>
       <Header
         style={{
           display: 'flex',
@@ -253,7 +267,7 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
                   <Badge count={alertsNoRead?.length} size="small">
                     <Button
                       type="text"
-                      icon={<BellOutlined style={{ fontSize: '20px' }} />}
+                      icon={<BellOutlined style={bellIconStyle} />}
                     />
                   </Badge>
                 </Dropdown>

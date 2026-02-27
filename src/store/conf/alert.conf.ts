@@ -4,7 +4,7 @@ export const alertConf = {
     getAlerts: '/alerts/alertsbycompany/${idCompany}',
     getAlertsNoRead: '/alerts/activealertsbycompany/${idCompany}',
     getAlertById: '/alerts/alertsbyid/${id}',
-    changeAlertStatus: '/alerts/changestatus/${id}',
+    changeAlertStatus: (id: number) => `/alerts/changestatus/${id}`,
     notifyAlertMobile: '/notifications/send',
   },
 };

@@ -35,6 +35,7 @@ export type User = {
   company: Company;
   role: number;
   hasAlert: boolean;
+  mobileVersion: string;
 };
 
 export type Company = {

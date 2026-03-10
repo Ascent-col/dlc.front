@@ -49,7 +49,7 @@ export const userApiSlice = userApi.injectEndpoints({
       query: ({ id, newPassword }: { id: number; newPassword: string }) => ({
         url: userConf.endpoints.editPasswordUser,
         method: 'PUT',
-        body: newPassword,
+        body: { newPassword },
         params: { id },
       }),
     }),

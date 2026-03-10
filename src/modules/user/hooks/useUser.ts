@@ -56,9 +56,11 @@ export default function useUser() {
 
   const editPasswordUser = async (id: number, passsword: string) => {
     await editPasswordUserMutation({ id, newPassword: passsword });
-    if (errorEditPasswordUser)
+    if (errorEditPasswordUser) {
       message.error('El usuario no se ha modificado exitosamente');
-    message.success('El usuario se ha modificado exitosamente');
+    } else {
+      message.success('El usuario se ha modificado exitosamente');
+    }
   };
 
   const getUsersByRole = async (role: number) => {

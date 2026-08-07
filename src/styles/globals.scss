@@ -194,8 +194,9 @@ input,
 }
 
 .notifications-panel__list.ant-menu {
-  max-height: min(42dvh, 360px);
-  overflow-y: auto;
+  max-height: min(324px, calc(100dvh - 240px));
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   border-inline-end: 0;
 }
 

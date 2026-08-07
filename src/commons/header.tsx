@@ -107,7 +107,16 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
         <Badge count={alertsNoRead.length} />
       </div>
 
-      <Menu className="notifications-panel__list">
+      <Menu
+        className="notifications-panel__list"
+        style={{
+          maxHeight:
+            alertsNoRead.length > 5
+              ? 'min(324px, calc(100dvh - 240px))'
+              : 'none',
+          overflowY: alertsNoRead.length > 5 ? 'auto' : 'visible',
+        }}
+      >
         {alertsNoRead?.length > 0 ? (
           alertsNoRead?.map((notif, index) => (
             <div key={`${notif?.id}-${notif?.date}`}>

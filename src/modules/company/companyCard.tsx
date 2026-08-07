@@ -80,10 +80,12 @@ const CompanyCards = () => {
 
   return (
     <App>
-      <Col style={{ paddingRight: 24, paddingTop: 24 }}>
-        <Title level={1}>Administra las compañías aquí!</Title>
+      <Col className="admin-content">
+        <Title className="admin-title" level={1}>
+          Administra las compañías aquí
+        </Title>
         <Row gutter={16}>
-          <Col span={12}>
+          <Col xs={24} md={12}>
             <Search
               placeholder="Buscar por nombre de compañía"
               onSearch={handleSearch}
@@ -92,10 +94,11 @@ const CompanyCards = () => {
             />
           </Col>
         </Row>
-        <Row gutter={[16, 16]}>
+        <Row className="admin-grid" gutter={[16, 16]}>
           {paginatedCompany.map((company) => (
-            <Col key={company.id} flex="0 0 300px">
+            <Col key={company.id} xs={24} sm={12} xl={8} xxl={6}>
               <Card
+                className="admin-card"
                 actions={[
                   <Tooltip key={company.id} title="Editar Compañía">
                     <EditOutlined
@@ -128,7 +131,6 @@ const CompanyCards = () => {
                     </Popconfirm>
                   </Tooltip>,
                 ]}
-                style={{ width: 350, height: 150 }}
               >
                 <Meta
                   avatar={<UserOutlined />}
@@ -150,6 +152,8 @@ const CompanyCards = () => {
           <Button
             type="primary"
             shape="circle"
+            aria-label="Añadir compañía"
+            className="floating-action"
             icon={<PlusOutlined style={{ fontSize: '24px' }} />}
             onClick={handleAddUser}
             style={{
@@ -157,10 +161,7 @@ const CompanyCards = () => {
               bottom: 30,
               right: 30,
               zIndex: 1000,
-              width: 60,
-              height: 60,
               fontSize: 24,
-              lineHeight: '60px',
             }}
           />
         </Tooltip>

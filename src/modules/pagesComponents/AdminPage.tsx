@@ -38,6 +38,7 @@ const AdminPage: React.FC = () => {
         />
         <Layout>
           <Tabs
+            className="admin-tabs"
             defaultActiveKey="Usuarios"
             tabPosition="left"
             style={{

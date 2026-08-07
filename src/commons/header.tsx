@@ -178,6 +178,7 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
     >
       <style>{bellAnimation}</style>
       <Header
+        className="app-header"
         style={{
           display: 'flex',
           paddingLeft: '10px',
@@ -192,14 +193,17 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
             justifyContent: 'space-between',
           }}
         >
-          <Col style={{ width: '200px', height: '100%' }}>
+          <Col
+            className="app-header__logo"
+            style={{ width: '200px', height: '100%' }}
+          >
             <Row>
               <Link href="/maps">
                 <Image
                   src="/LOGODCL.png"
                   width={100}
                   height={60}
-                  alt="imagen"
+                  alt="DLC"
                   priority
                 />
               </Link>
@@ -249,7 +253,10 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
             </Col>
           )}
 
-          <Col style={{ width: '200px', height: '100%' }}>
+          <Col
+            className="app-header__actions"
+            style={{ width: '200px', height: '100%' }}
+          >
             <Row
               justify="end"
               style={{
@@ -268,6 +275,7 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
                     <Button
                       type="text"
                       icon={<BellOutlined style={bellIconStyle} />}
+                      aria-label="Abrir notificaciones"
                     />
                   </Badge>
                 </Dropdown>
@@ -278,7 +286,11 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
                 title="Detalles del Usuario"
                 trigger="hover"
               >
-                <Avatar icon={<UserOutlined />} style={{ cursor: 'pointer' }} />
+                <Button
+                  type="text"
+                  aria-label="Ver detalles del usuario"
+                  icon={<Avatar icon={<UserOutlined />} />}
+                />
               </Popover>
             </Row>
           </Col>

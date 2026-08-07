@@ -125,10 +125,12 @@ const UserCards = () => {
 
   return (
     <App>
-      <Col style={{ paddingRight: 24, paddingTop: 24 }}>
-        <Title level={1}>Administra los usuarios aquí!</Title>
+      <Col className="admin-content">
+        <Title className="admin-title" level={1}>
+          Administra los usuarios aquí
+        </Title>
         <Row gutter={16}>
-          <Col span={12}>
+          <Col xs={24} md={12}>
             <Search
               placeholder="Buscar por nombre o apellido"
               onSearch={handleSearch}
@@ -136,7 +138,7 @@ const UserCards = () => {
               style={{ marginBottom: 20 }}
             />
           </Col>
-          <Col span={12}>
+          <Col xs={24} md={12}>
             <Search
               placeholder="Buscar por compañía"
               onSearch={handleCompanySearch}
@@ -145,9 +147,9 @@ const UserCards = () => {
             />
           </Col>
         </Row>
-        <Row gutter={[16, 16]} wrap>
+        <Row className="admin-grid" gutter={[16, 16]} wrap>
           {paginatedUsers.map((user) => (
-            <Col key={user.id} flex="0 0 300px">
+            <Col key={user.id} xs={24} sm={12} xl={8} xxl={6}>
               <UserCardEsp
                 user={user}
                 handleEditClick={handleEditClick}
@@ -169,6 +171,8 @@ const UserCards = () => {
           <Button
             type="primary"
             shape="circle"
+            aria-label="Añadir usuario"
+            className="floating-action"
             icon={<PlusOutlined style={{ fontSize: '24px' }} />}
             onClick={() => setIsModalVisible(true)}
             style={{
@@ -176,10 +180,7 @@ const UserCards = () => {
               bottom: 30,
               right: 30,
               zIndex: 1000,
-              width: 60,
-              height: 60,
               fontSize: 24,
-              lineHeight: '60px',
             }}
           />
         </Tooltip>

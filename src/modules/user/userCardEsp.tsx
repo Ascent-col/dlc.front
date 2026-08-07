@@ -62,6 +62,7 @@ const UserCardEsp: React.FC<UserCardEspProps> = ({
 
   return (
     <Card
+      className="admin-card"
       actions={[
         <Tooltip key="edit" title="Editar Usuario">
           <EditOutlined onClick={() => handleEditClick(user)} />
@@ -89,7 +90,6 @@ const UserCardEsp: React.FC<UserCardEspProps> = ({
           </Popconfirm>
         </Tooltip>,
       ]}
-      style={{ width: 300, height: 150 }}
     >
       <Meta
         title={

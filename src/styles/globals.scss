@@ -41,6 +41,9 @@
   --callout-border-rgb: 172, 175, 176;
   --card-rgb: 180, 185, 188;
   --card-border-rgb: 131, 134, 135;
+  --brand-navy: #001529;
+  --surface-muted: #f5f5f5;
+  --focus-ring: #1677ff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -87,6 +90,235 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+}
+
+button,
+a,
+input,
+[tabindex] {
+  &:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--focus-ring) 45%, transparent);
+    outline-offset: 2px;
+  }
+}
+
+.app-header {
+  position: relative;
+  z-index: 10;
+  min-height: 64px;
+  box-shadow: 0 2px 10px rgba(0, 21, 41, 0.18);
+}
+
+.admin-content {
+  width: 100%;
+  padding: 24px clamp(16px, 3vw, 40px) 88px;
+}
+
+.admin-title.ant-typography {
+  margin-bottom: 24px;
+  color: var(--brand-navy);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.admin-grid > .ant-col {
+  display: flex;
+}
+
+.admin-card.ant-card {
+  width: 100% !important;
+  min-height: 150px;
+  height: auto !important;
+  border-color: #e2e8f0;
+  box-shadow: 0 3px 12px rgba(0, 21, 41, 0.07);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.admin-card.ant-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 21, 41, 0.12);
+}
+
+.floating-action.ant-btn {
+  width: 56px;
+  height: 56px;
+  box-shadow: 0 6px 18px rgba(0, 21, 41, 0.25);
+}
+
+.map-workspace {
+  min-width: 0;
+  padding: 0 24px !important;
+}
+
+.alerts-table .ant-table-wrapper {
+  overflow-x: auto;
+}
+
+.notifications-panel {
+  width: min(380px, calc(100vw - 24px));
+  overflow: hidden;
+  border: 1px solid #e6edf5;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 36px rgba(0, 21, 41, 0.18);
+}
+
+.notifications-panel__header,
+.notifications-panel__footer {
+  padding: 16px;
+}
+
+.notifications-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.notifications-panel__title,
+.notifications-panel__subtitle,
+.notifications-panel__date {
+  display: block;
+}
+
+.notifications-panel__title {
+  color: var(--brand-navy);
+  font-size: 1rem;
+}
+
+.notifications-panel__subtitle,
+.notifications-panel__date {
+  color: #6b7986;
+  font-size: 0.75rem;
+}
+
+.notifications-panel__list.ant-menu {
+  max-height: min(324px, calc(100dvh - 240px));
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  border-inline-end: 0;
+}
+
+.notifications-panel__item.ant-menu-item {
+  height: auto;
+  min-height: 64px;
+  margin: 0;
+  padding: 12px 16px !important;
+  border-radius: 0;
+  line-height: 1.45;
+}
+
+.notifications-panel__status {
+  margin-top: 3px;
+  font-size: 1rem;
+}
+
+.notifications-panel__empty.ant-menu-item {
+  height: auto;
+  margin: 0;
+  padding: 12px;
+}
+
+.notifications-panel__footer {
+  border-top: 1px solid #edf1f5;
+  background: #f8fafc;
+}
+
+.alert-history {
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.alert-history__heading {
+  display: flex;
+  padding: 14px 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.alert-history__heading .ant-typography {
+  margin: 0;
+}
+
+.alert-history .ant-table-row:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline-offset: -3px;
+}
+
+@media (max-width: 767px) {
+  .app-header.ant-layout-header {
+    height: auto;
+    min-height: 56px;
+    padding: 0 8px !important;
+    line-height: normal;
+  }
+
+  .app-header__logo {
+    width: 78px !important;
+  }
+
+  .app-header__actions {
+    width: auto !important;
+  }
+
+  .admin-tabs > .ant-tabs-nav {
+    width: 100% !important;
+    margin-bottom: 0;
+  }
+
+  .admin-tabs.ant-tabs-left {
+    display: block;
+  }
+
+  .admin-tabs.ant-tabs-left > .ant-tabs-nav .ant-tabs-nav-list {
+    flex-direction: row;
+  }
+
+  .admin-tabs .ant-tabs-content-holder {
+    border-left: 0;
+  }
+
+  .admin-content {
+    padding-top: 20px;
+  }
+
+  .map-body.ant-layout {
+    flex-direction: column;
+  }
+
+  .map-sidebar.ant-layout-sider {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    flex: 0 0 min(42dvh, 360px) !important;
+  }
+
+  .map-sidebar .ant-space {
+    max-height: calc(min(42dvh, 360px) - 54px) !important;
+  }
+
+  .map-workspace {
+    min-height: 58dvh;
+    padding: 8px !important;
+  }
+}
+
+@media (max-width: 575px) {
+  .ant-modal .ant-form .ant-row > .ant-col {
+    max-width: 100%;
+    flex: 0 0 100%;
+  }
+
+  .ant-modal {
+    max-width: calc(100vw - 24px);
+    margin: 12px auto;
+  }
 }
 
 body {

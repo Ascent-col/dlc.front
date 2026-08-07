@@ -159,8 +159,9 @@ const MainPage: React.FC = () => {
         }}
         historyAlert={historyAlert}
       />
-      <Layout>
+      <Layout className="map-body">
         <Sider
+          className="map-sidebar"
           width={`${siderWidth}%`}
           style={{
             background: '#fff',
@@ -430,7 +431,7 @@ const MainPage: React.FC = () => {
           </Footer>
         </Layout> */}
 
-        <Layout style={{ padding: '0 24px 0 24px', height: '100%' }}>
+        <Layout className="map-workspace" style={{ height: '100%' }}>
           <Content
             style={{
               padding: 10,
@@ -465,6 +466,7 @@ const MainPage: React.FC = () => {
               </div>
               {historyAlert && (
                 <div
+                  className="alerts-table"
                   style={{
                     flex: '0 0 40%',
                     overflowY: 'auto',

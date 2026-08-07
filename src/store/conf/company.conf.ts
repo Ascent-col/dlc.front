@@ -1,5 +1,7 @@
+import { BASE_URL } from '@/commons/constants';
+
 export const companyConf = {
-  host: process.env.NEXT_PUBLIC_BACKEND_URL,
+  host: BASE_URL,
   endpoints: {
     getCompanies: '/companies',
     createCompany: '/companies/createCompany',

@@ -1,2 +1,3 @@
-export const BASE_URL = 'https://dlcsas.com:3001';
-// export const BASE_URL = 'http://localhost:3001';
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+export const BASE_URL = backendUrl;

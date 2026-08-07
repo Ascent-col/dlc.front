@@ -1,5 +1,7 @@
+import { BASE_URL } from '@/commons/constants';
+
 export const alertConf = {
-  host: process.env.NEXT_PUBLIC_BACKEND_URL,
+  host: BASE_URL,
   endpoints: {
     getAlerts: '/alerts/alertsbycompany/${idCompany}',
     getAlertsNoRead: '/alerts/activealertsbycompany/${idCompany}',

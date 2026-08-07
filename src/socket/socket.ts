@@ -1,11 +1,12 @@
 /* eslint-disable no-console */
+import { BASE_URL } from '@/commons/constants';
 import { io, Socket } from 'socket.io-client';
 
 let socket: Socket | null = null;
 
 export const initSocket = (companyId: number) => {
   if (!socket) {
-    socket = io(process.env.NEXT_PUBLIC_BACKEND_URL, {
+    socket = io(BASE_URL, {
       query: { companyId },
       transports: ['websocket'],
     });

@@ -5,6 +5,7 @@ import { AlertTwoTone } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { addNewAlert } from '@/store/alert/alert.feature';
+import { BASE_URL } from './constants';
 
 const WebSocketListener = () => {
   const { currentUser } = useSelector((state: RootState) => state.auth);
@@ -20,7 +21,7 @@ const WebSocketListener = () => {
       currentUser?.role === 2 &&
       currentUser?.company?.id
     ) {
-      const newSocket = io('https://dlcsas.com:3001', {
+      const newSocket = io(BASE_URL, {
         query: { companyId: currentUser.company.id },
         transports: ['websocket'],
       });

@@ -1,6 +1,6 @@
 import { RootState } from '@/store/store';
 import { Alert } from '@/types';
-import { ConfigProvider, Table, Tag } from 'antd';
+import { ConfigProvider, Empty, Space, Table, Tag, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 
 export enum AlertStatus {
@@ -15,11 +15,14 @@ const AlertStatusColor: Record<number, string> = {
   [AlertStatus.Leida]: '#1288e8ff',
 };
 
+const { Text, Title } = Typography;
+
 const columns = [
   {
     title: 'Nombre',
     dataIndex: 'fullname',
     key: 'fullname',
+    ellipsis: true,
   },
   {
     title: 'Fecha',
@@ -30,6 +33,7 @@ const columns = [
     title: 'Hora',
     dataIndex: 'time',
     key: 'time',
+    responsive: ['sm' as const],
   },
   {
     title: 'Estado',
@@ -49,6 +53,7 @@ const columns = [
     title: 'Tipo Alerta',
     dataIndex: 'message',
     key: 'message',
+    ellipsis: true,
   },
 ];
 
@@ -77,26 +82,56 @@ export const TableAlerts = ({
         },
       }}
     >
-      <Table
-        bordered
-        dataSource={alertsToShow}
-        columns={columns}
-        onRow={(record) => {
-          return {
-            onClick: () => {
-              showAlert(record);
-            },
-            style: { cursor: 'pointer' },
-          };
-        }}
-        pagination={{
-          pageSize: 7,
-          hideOnSinglePage: true,
-          pageSizeOptions: [],
-          size: 'small',
-        }}
-        size="small"
-      />
+      <section className="alert-history" aria-labelledby="alert-history-title">
+        <div className="alert-history__heading">
+          <Space direction="vertical" size={0}>
+            <Title level={4} id="alert-history-title">
+              Historial de alertas
+            </Title>
+            <Text type="secondary">
+              Selecciona una alerta para verla en el mapa
+            </Text>
+          </Space>
+          <Tag color="blue">{alertsToShow.length} registros</Tag>
+        </div>
+        <Table
+          bordered
+          rowKey={(record) => `${record.id}-${record.date}-${record.time}`}
+          dataSource={alertsToShow}
+          columns={columns}
+          locale={{
+            emptyText: (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No hay alertas en el historial"
+              />
+            ),
+          }}
+          scroll={{ x: 620 }}
+          onRow={(record) => {
+            return {
+              onClick: () => showAlert(record),
+              onKeyDown: (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  showAlert(record);
+                }
+              },
+              tabIndex: 0,
+              'aria-label': `Ver alerta de ${record.fullname}`,
+              style: { cursor: 'pointer' },
+            };
+          }}
+          pagination={{
+            pageSize: 7,
+            hideOnSinglePage: true,
+            pageSizeOptions: [],
+            size: 'small',
+            showTotal: (total) => `${total} alertas`,
+          }}
+          size="small"
+        />
+      </section>
     </ConfigProvider>
   );
 };

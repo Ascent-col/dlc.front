@@ -12,12 +12,15 @@ import {
   Menu,
   Badge,
   Divider,
+  Empty,
+  Space,
 } from 'antd';
 import {
   UserOutlined,
   LogoutOutlined,
   BellOutlined,
   ExclamationCircleFilled,
+  HistoryOutlined,
 } from '@ant-design/icons';
 import { Alert, User } from '@/types';
 import Image from 'next/image';
@@ -89,60 +92,83 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
   };
 
   const notificationMenu = (
-    <Menu style={{ maxHeight: '30vh', overflowY: 'auto' }}>
-      <Button
-        type="primary"
-        style={{
-          backgroundColor: '#001529',
-          color: '#ffffff',
-        }}
-        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#082946')}
-        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#6B7986')}
-        onClick={() => historyNotication?.()}
-      >
-        Ver historial de alertas
-      </Button>
+    <div className="notifications-panel" aria-label="Notificaciones">
+      <div className="notifications-panel__header">
+        <div>
+          <Text strong className="notifications-panel__title">
+            Alertas recientes
+          </Text>
+          <Text className="notifications-panel__subtitle">
+            {alertsNoRead.length === 1
+              ? '1 alerta sin leer'
+              : `${alertsNoRead.length} alertas sin leer`}
+          </Text>
+        </div>
+        <Badge count={alertsNoRead.length} />
+      </div>
 
-      {alertsNoRead?.length > 0 ? (
-        alertsNoRead?.map((notif, index) => (
-          <div key={`${notif?.id}-${notif?.date}`}>
-            <Menu.Item
-              key={`${notif?.id}-${notif?.date}`}
-              style={{ padding: '1em' }}
-              onClick={() =>
-                showAlert({
-                  id: notif?.id,
-                  iduser: notif?.iduser,
-                  date: notif?.date,
-                })
-              }
-            >
-              <Text strong>
-                <ExclamationCircleFilled
-                  style={{ color: notif.status === 0 ? '#DB524A' : '#838696' }}
-                />{' '}
-                {notif?.fullname}
-              </Text>{' '}
-              <br />
-              <Text style={{ color: '#A1B2D3' }}>
-                {formatDate(notif?.date)}
-              </Text>{' '}
-            </Menu.Item>
-            {index < alertsNoRead.length - 1 && (
-              <Divider
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  borderColor: '#001628',
-                }}
-              />
-            )}
-          </div>
-        ))
-      ) : (
-        <Menu.Item disabled>No hay alerts</Menu.Item>
-      )}
-    </Menu>
+      <Menu className="notifications-panel__list">
+        {alertsNoRead?.length > 0 ? (
+          alertsNoRead?.map((notif, index) => (
+            <div key={`${notif?.id}-${notif?.date}`}>
+              <Menu.Item
+                key={`${notif?.id}-${notif?.date}`}
+                className="notifications-panel__item"
+                onClick={() =>
+                  showAlert({
+                    id: notif?.id,
+                    iduser: notif?.iduser,
+                    date: notif?.date,
+                  })
+                }
+              >
+                <Space align="start">
+                  <ExclamationCircleFilled
+                    className="notifications-panel__status"
+                    style={{
+                      color: notif.status === 0 ? '#DB524A' : '#838696',
+                    }}
+                  />
+                  <div>
+                    <Text strong>{notif?.fullname}</Text>
+                    <Text className="notifications-panel__date">
+                      {formatDate(notif?.date)}
+                    </Text>
+                  </div>
+                </Space>
+              </Menu.Item>
+              {index < alertsNoRead.length - 1 && (
+                <Divider
+                  style={{
+                    margin: 0,
+                    padding: 0,
+                    borderColor: '#001628',
+                  }}
+                />
+              )}
+            </div>
+          ))
+        ) : (
+          <Menu.Item disabled className="notifications-panel__empty">
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No hay alertas pendientes"
+            />
+          </Menu.Item>
+        )}
+      </Menu>
+
+      <div className="notifications-panel__footer">
+        <Button
+          type="primary"
+          block
+          icon={<HistoryOutlined />}
+          onClick={() => historyNotication?.()}
+        >
+          Ver historial de alertas
+        </Button>
+      </div>
+    </div>
   );
 
   const userContent = (

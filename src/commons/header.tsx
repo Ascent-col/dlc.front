@@ -21,6 +21,7 @@ import {
   BellOutlined,
   ExclamationCircleFilled,
   HistoryOutlined,
+  DashboardOutlined,
 } from '@ant-design/icons';
 import { Alert, User } from '@/types';
 import Image from 'next/image';
@@ -269,6 +270,19 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
                   </Button>
                 </Col>
               </Row>
+            </Col>
+          )}
+          {(user?.role === 1 || user?.role === 2) && (
+            <Col flex="1 1 auto" className="app-header__dashboard-link">
+              <Button
+                type="default"
+                size="large"
+                style={{ ...stylesButtons, width: '180px' }}
+                icon={<DashboardOutlined />}
+                onClick={() => push('/dashboard')}
+              >
+                Dashboard
+              </Button>
             </Col>
           )}
           {historyAlert && (

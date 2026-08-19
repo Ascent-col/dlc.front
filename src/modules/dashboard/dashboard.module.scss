@@ -1,0 +1,297 @@
+.shell {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+.content {
+  width: 100%;
+  max-width: 1540px;
+  margin: 0 auto;
+  padding: 32px clamp(16px, 3vw, 44px) 56px;
+}
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.pageHeader h1 {
+  margin: 3px 0 2px !important;
+  color: #001529;
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+}
+.eyebrow {
+  color: #1677ff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.filters {
+  margin-bottom: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 3px 12px rgba(0, 21, 41, 0.06);
+}
+.filterGrid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.6fr) minmax(260px, 1fr) auto;
+  align-items: end;
+  gap: 16px;
+}
+.filterField {
+  display: grid;
+  gap: 7px;
+  color: #344454;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.filterGrid :global(.ant-select),
+.filterGrid :global(.ant-picker) {
+  width: 100%;
+}
+.filterSummary {
+  margin-top: 12px;
+  align-items: center;
+}
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.kpis :global(.ant-card) {
+  border-color: #e2e8f0;
+  box-shadow: 0 3px 12px rgba(0, 21, 41, 0.06);
+}
+.kpis :global(.ant-statistic-title) {
+  min-height: 42px;
+  color: #6b7986;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.kpis :global(.ant-statistic-content) {
+  color: #001529;
+  font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+}
+.kpis :global(.ant-statistic-content-prefix) {
+  margin-right: 10px;
+  color: #1677ff;
+  font-size: 1.2rem;
+}
+.mainGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.mainGrid > :global(.ant-card),
+.locationCard,
+.tableCard {
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 14px rgba(0, 21, 41, 0.06);
+}
+.formBars {
+  display: grid;
+  gap: 10px;
+}
+.formBars button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: 100%;
+  padding: 10px 12px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #001529;
+  text-align: left;
+  cursor: pointer;
+}
+.formBars button:hover,
+.formBars .activeBar {
+  border-color: #91caff;
+  background: #f0f7ff;
+}
+.formBars span,
+.locationBar span,
+.userList span {
+  min-width: 0;
+}
+.formBars strong,
+.formBars small,
+.locationBar strong,
+.locationBar small,
+.userList strong,
+.userList small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.formBars small,
+.locationBar small,
+.userList small {
+  color: #6b7986;
+  font-weight: 400;
+}
+.barValue {
+  text-align: right;
+  font-weight: 700;
+}
+.formBars :global(.ant-progress) {
+  grid-column: 1 / -1;
+  margin-top: 5px;
+  line-height: 1;
+}
+.userSummary {
+  display: grid;
+  grid-template-columns: 155px minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+  min-height: 230px;
+}
+.donut {
+  display: grid;
+  place-items: center;
+  width: 150px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, white 0 44%, transparent 46%),
+    conic-gradient(#1677ff 0 49%, #001529 49% 81%, #91caff 81%);
+}
+.donut span {
+  text-align: center;
+}
+.donut strong,
+.donut small {
+  display: block;
+}
+.donut strong {
+  color: #001529;
+  font-size: 1.25rem;
+}
+.donut small {
+  color: #6b7986;
+  font-size: 0.7rem;
+}
+.userList {
+  display: grid;
+  gap: 10px;
+}
+.userList > div {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #edf1f5;
+}
+.userList i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #1677ff;
+}
+.userList .dot2 {
+  background: #001529;
+}
+.userList .dot3 {
+  background: #91caff;
+}
+.userList b {
+  color: #001529;
+  text-align: right;
+}
+.locationCard,
+.tableCard,
+.empty {
+  margin-bottom: 20px;
+}
+.locationGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+}
+.locationGrid h5 {
+  color: #001529;
+}
+.locationBar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin: 14px 0;
+}
+.locationBar :global(.ant-progress) {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+.mockNotice {
+  margin-top: 20px;
+}
+
+@media (max-width: 1100px) {
+  .kpis {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 767px) {
+  .content {
+    padding-top: 20px;
+    padding-bottom: 32px;
+  }
+  .pageHeader {
+    align-items: center;
+  }
+  .pageHeader > div {
+    min-width: 0;
+  }
+  .pageHeader :global(.ant-typography-secondary) {
+    display: none;
+  }
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+  .kpis {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .kpis > :last-child {
+    grid-column: 1 / -1;
+  }
+  .userSummary {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  .userList {
+    width: 100%;
+  }
+  .locationGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+@media (max-width: 430px) {
+  .pageHeader button {
+    width: 40px;
+    padding-inline: 0;
+    font-size: 0;
+  }
+  .pageHeader button :global(.anticon) {
+    margin: 0;
+    font-size: 1rem;
+  }
+  .kpis {
+    grid-template-columns: 1fr;
+  }
+  .kpis > :last-child {
+    grid-column: auto;
+  }
+  .mainGrid :global(.ant-card-head) {
+    align-items: flex-start;
+  }
+  .mainGrid :global(.ant-card-extra) {
+    margin-inline-start: 8px;
+  }
+}

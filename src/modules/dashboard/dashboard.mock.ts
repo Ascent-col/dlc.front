@@ -22,8 +22,15 @@ export type DashboardSurvey = {
   withoutAsset: number;
   users: DashboardUser[];
   locations: DashboardLocation[];
-  locationsWithoutActivity: { id: number; name: string }[];
 };
+
+// VisitTrack devuelve estos catálogos en el nivel raíz del contador múltiple,
+// no asociados a un Survey específico.
+export const dashboardLocationsWithoutActivity = [
+  { id: 1072, name: 'Portería occidental' },
+  { id: 1084, name: 'Bodega de repuestos' },
+  { id: 1090, name: 'Archivo central' },
+];
 
 export const dashboardSurveys: DashboardSurvey[] = [
   {
@@ -62,10 +69,6 @@ export const dashboardSurveys: DashboardSurvey[] = [
         deleted: 2,
       },
     ],
-    locationsWithoutActivity: [
-      { id: 1072, name: 'Portería occidental' },
-      { id: 1084, name: 'Bodega de repuestos' },
-    ],
   },
   {
     id: 21804,
@@ -103,7 +106,6 @@ export const dashboardSurveys: DashboardSurvey[] = [
         deleted: 2,
       },
     ],
-    locationsWithoutActivity: [{ id: 1090, name: 'Archivo central' }],
   },
   {
     id: 21916,
@@ -141,10 +143,6 @@ export const dashboardSurveys: DashboardSurvey[] = [
         deleted: 1,
       },
     ],
-    locationsWithoutActivity: [
-      { id: 1072, name: 'Portería occidental' },
-      { id: 1090, name: 'Archivo central' },
-    ],
   },
   {
     id: 22102,
@@ -156,9 +154,5 @@ export const dashboardSurveys: DashboardSurvey[] = [
     withoutAsset: 0,
     users: [],
     locations: [],
-    locationsWithoutActivity: [
-      { id: 1054, name: 'Planta Norte' },
-      { id: 1058, name: 'Almacén Central' },
-    ],
   },
 ];

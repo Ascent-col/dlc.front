@@ -14,17 +14,19 @@ Este documento convierte las notas funcionales del dashboard en dos prompts list
 - `getSurveysActivityStats` ofrece el resumen por formulario y usuario, mientras
   `getSurveysActivityCounter` ofrece el detalle por location/asset de un formulario. Son fuentes
   complementarias.
-- Para seleccionar varios formularios, el backend puede consultar el contador de cada formulario
-  con concurrencia limitada y devolver un resultado parcial claramente identificado si Visitrack
-  falla para alguno.
-- Los endpoints documentados **no entregan actividades individuales ni `jsonAnswers`**. Antes de
-  construir esa parte hace falta confirmar con Visitrack el endpoint, método, parámetros,
-  paginación y contrato de respuesta. El prompt de backend deja un contrato interno propuesto, pero
-  no inventa una URL externa.
+- `getSurveysActivityCounter` acepta múltiples SurveyID separados por comas en una sola petición.
+  `count` puede ser menor al número solicitado, por lo que se debe reconciliar la respuesta por
+  SurveyID y reportar los IDs omitidos sin inventar resultados.
+- `getActivitiesByFormIDAndUpdatedOnPDF` entrega actividades individuales y `jsonAnswers`, requiere
+  una petición por Survey y no tiene paginación confirmada. Debe reservarse para detalle o exportación,
+  nunca para recalcular estadísticas ya disponibles.
+- `LocationsSinActividad` y `AssetsSinActividad` pertenecen al nivel raíz del contador múltiple; no se
+  deben atribuir a un Survey particular.
 - `getSurveysActivityStats` no recibe IDs de formularios; el filtrado de formularios seleccionados
   debe hacerse en nuestra capa de integración o en el frontend.
-- El rango debe manejar fechas inclusivas en formato `YYYY-MM-DD`, validar `from <= to` y conservar
-  la zona horaria de negocio definida por el backend.
+- Los endpoints estadísticos usan `YYYY-MM-DD`; el detalle usa provisionalmente
+  `YYYY-MM-DD 00:00` → `YYYY-MM-DD 23:59`. Se debe validar `from <= to` sin asumir todavía zona
+  horaria ni inclusividad del proveedor.
 
 ## Prompt 1: diseño del dashboard en Stitch
 
@@ -108,9 +110,9 @@ Sección “Desglose por ubicación” para un formulario:
 - Si existen locations, gráfico de barras Location vs. cantidad de actividades, ordenable por total.
   Tooltip al hover/focus con LocationID, nombre, total, activas, eliminadas y porcentaje del total
   del formulario. Añadir total general visible.
-- Tabla “Locations sin actividad en el periodo” con LocationID obligatorio y LocationName cuando
-  exista; incluir contador total, búsqueda, paginación y exportación visual como acción futura
-  deshabilitada si aún no está implementada.
+- Tabla “Locations sin actividad en la selección” con LocationID obligatorio y LocationName cuando
+  exista; aclarar que es un resultado global para los Surveys consultados y no atribuir las filas al
+  formulario activo. Incluir contador total, búsqueda y paginación.
 - Para assets, repetir el patrón en un tab “Assets”: actividad, total y lista de AssetID sin
   actividad.
 - Mostrar contadores explícitos para actividades sin location y sin asset.
@@ -225,29 +227,56 @@ Usa el prefijo/versionado real del proyecto. Los nombres siguientes expresan el 
      únicos de la selección a menos que el proveedor lo garantice.
 
 4. GET `/integrations/visitrack/activity/counters?surveyIds=1,2&from=YYYY-MM-DD&to=YYYY-MM-DD`
-   - Acepta uno o varios IDs; “todos” se resuelve en servidor consultando primero `/surveys`, con un
-     máximo configurable para evitar fan-out ilimitado.
-   - Por cada SurveyID consulta:
-     GET `https://services.visitrack.com/getSurveysActivityCounter?CompanyID={companyIdVt}&SurveyID={SurveyID}&from={from}&to={to}`.
-   - Ejecuta con concurrencia limitada, conserva el orden solicitado y devuelve resultados por
-     formulario con SurveyID, Title, TotalActividades, TotalActivas, TotalEliminadas,
-     ActividadesSinLocation, ActividadesSinAsset, Locations, Assets, LocationsSinActividad y
-     AssetsSinActividad.
-   - Normaliza IDs y contadores a tipos consistentes y trata arrays ausentes como `[]` solo si el
-     contrato permite distinguirlos de “dato no disponible”.
-   - Soporta éxito parcial: HTTP 200 con `data`, `errors` por SurveyID y metadatos
-     `requested/succeeded/failed`; reserva 502/504 para fallo total del proveedor.
+   - Envía una sola petición al proveedor con los IDs positivos, deduplicados y separados por comas:
+     GET `https://services.visitrack.com/getSurveysActivityCounter?CompanyID={companyIdVt}&SurveyID={idsCsv}&from={from}&to={to}`.
+   - Trata siempre `response` como arreglo y mapea cada elemento por SurveyID; nunca utiliza
+     `response[0]` como supuesto contrato de Survey único.
+   - Devuelve por Survey: SurveyID, Title, TotalActividades, TotalActivas, TotalEliminadas,
+     ActividadesSinLocation, ActividadesSinAsset, Locations y Assets.
+   - Conserva `LocationsSinActividad` y `AssetsSinActividad` como colecciones globales de la respuesta,
+     fuera de los Surveys. No inventa una relación entre esos elementos y un Survey.
+   - `count` representa Surveys efectivamente devueltos, no IDs solicitados. La respuesta interna debe
+     incluir `requestedSurveyIds`, `returnedSurveyIds` y `missingSurveyIds` para hacer explícitas las
+     omisiones del proveedor. Una omisión no es por sí sola un fallo HTTP total.
+   - Normaliza IDs y contadores a tipos consistentes. Un Survey puede tener actividad y `Locations: []`
+     o `Assets: []`; en ese caso se deben respetar ActividadesSinLocation/ActividadesSinAsset.
 
-5. GET `/integrations/visitrack/activity/answers?surveyIds=1,2&from=YYYY-MM-DD&to=YYYY-MM-DD&cursor=...`
-   - Este contrato interno es necesario para traer todos los `jsonAnswers` sin importar el estado,
-     pero NO se puede implementar contra Visitrack con la información actual.
-   - Deja el endpoint sin conectar o detrás de feature flag y responde 501 con código estable
-     `VISITRACK_ANSWERS_ENDPOINT_NOT_CONFIGURED` hasta confirmar el endpoint externo.
-   - Añade el TODO:
-     `// TODO juan mora: confirmar endpoint Visitrack de actividades/jsonAnswers, autenticación, estados y paginación.`
-   - Cuando se confirme, paginar del lado del servidor, permitir todos los estados incluyendo
-     activos/eliminados, imponer límites y evitar cargar respuestas ilimitadas en memoria. Definir si
-     el frontend recibe páginas/cursor o si se crea un job/export asíncrono para volúmenes grandes.
+5. GET `/integrations/visitrack/catalogs/locations?includeDeleted=false`
+   - Consulta GET `https://services.visitrack.com/getLocationsByCompanyID?CompanyID={companyIdVt}&IsDeleted=0`.
+   - Normaliza `ID`, `Name` y `LocationTypeID`. Este es el catálogo general de compañía y no debe
+     confundirse con las Locations con actividad del contador.
+
+6. GET `/integrations/visitrack/catalogs/assets`
+   - Consulta GET `https://services.visitrack.com/getAssetsByCompanyID?CompanyID={companyIdVt}`.
+   - Tolera correctamente `response: []`; la ausencia de Assets es un estado válido, no un error.
+   - Validar los nombres exactos de campos del Asset contra una respuesta no vacía antes de fijar el DTO.
+
+7. GET `/integrations/visitrack/catalogs/statuses`
+   - Consulta GET `https://services.visitrack.com/DispatchByCompanyID?CompanyID={companyIdVt}`.
+   - Normaliza al menos ID, Name, BaseStatusID, Color, IsCompleted, IsDeleted e IsDeviceEnabled.
+   - El frontend usa ID como CompanyStatusID. Nunca hardcodear IDs porque dependen de la compañía.
+
+8. GET `/integrations/visitrack/activity/answers?surveyId=1&from=YYYY-MM-DD&to=YYYY-MM-DD&companyStatusId=&locationId=&assetId=`
+   - Consulta una vez por Survey:
+     GET `https://services.visitrack.com/getActivitiesByFormIDAndUpdatedOnPDF?CompanyID={companyIdVt}&SurveyID={surveyId}&from={fromDate}%2000:00&to={toDate}%2023:59&CompanyStatusID={companyStatusId}&LocationID={locationId}&AssetID={assetId}`.
+   - No se ha confirmado soporte de múltiples SurveyID, así que el contrato interno recibe uno solo.
+   - Los filtros opcionales vacíos significan “sin filtro”. Los IDs de estado se obtienen del catálogo.
+   - Modela `jsonAnswers` como `unknown`. Si llega como string, intenta parsearlo de forma segura y,
+     ante JSON inválido, conserva el valor original junto con un indicador de error; nunca impide
+     devolver las demás actividades.
+   - No inventar todavía nombres tipados para metadata de usuario, Location, Asset, estado o timestamps:
+     primero validarlos contra una respuesta completa real. Conservar campos desconocidos en un
+     payload externo aislado hasta completar el mapper.
+   - No existe paginación, límite, rate limit ni orden estable confirmados. Imponer un rango máximo
+     conservador configurable en nuestra API y devolver 413/422 antes de llamar al proveedor cuando
+     la consulta sea insegura. Si se necesita varios Surveys, usar un job/export asíncrono en lugar de
+     acumular respuestas grandes en memoria.
+   - Mantener provisionalmente 00:00 → 23:59 sin conversión UTC. Documentar que zona horaria e
+     inclusividad de `to` siguen pendientes de confirmación.
+   - `CompanyStatusID=` no aplica filtro explícito, pero aún debe verificarse si incluye registros
+     físicamente eliminados. No prometer “todos los estados” hasta validar ese comportamiento.
+   - Este endpoint solo se usa para detalle, inspección, agregación User → Location o exportación; no
+     se llama para KPIs, contadores ni gráficos ya cubiertos por stats/counters.
 
 CONTRATOS Y CÁLCULOS
 - Crear DTOs/types explícitos para request, respuesta del proveedor y respuesta normalizada; no usar
@@ -273,7 +302,7 @@ ARQUITECTURA SUGERIDA (adaptar a convenciones reales)
 
 PRUEBAS Y DOCUMENTACIÓN
 - Unit tests de mappers, filtros, recálculo de porcentajes, ceros, validación de fechas, deduplicación
-  de IDs y éxito parcial.
+  de IDs, reconciliación de Surveys omitidos y colecciones globales sin actividad.
 - Tests del servicio/cliente con HTTP mock: respuesta válida, timeout, 4xx, 429, 5xx, payload
   incompleto y compañía sin companyIdVt.
 - E2E del controller para permisos de admin/superadmin, rechazo de otros roles, queries inválidas y
@@ -285,24 +314,25 @@ PRUEBAS Y DOCUMENTACIÓN
 CRITERIOS DE ACEPTACIÓN
 - El frontend nunca envía ni conoce necesariamente el CompanyID externo para consultar estadísticas.
 - No existen CompanyID/SurveyID de ejemplo hardcodeados.
-- Los cuatro endpoints agregados funcionales entregan contratos estables y tipados.
-- La selección múltiple funciona con concurrencia acotada y fallos parciales visibles.
-- El endpoint de jsonAnswers queda explícitamente bloqueado hasta tener contrato real, sin datos
-  inventados.
-- `companyIdVt` y ambos TODO de Juan Mora quedan documentados en los puntos indicados.
+- Los endpoints agregados y catálogos entregan contratos estables y tipados.
+- La selección múltiple genera una sola petición CSV y hace visibles los SurveyID solicitados que el
+  proveedor no devolvió.
+- El endpoint de detalle acepta un Survey, trata `jsonAnswers` como dinámico y limita consultas de
+  volumen inseguro.
+- `companyIdVt` y su TODO de persistencia para Juan Mora quedan documentados en el punto indicado.
 ```
 
-## Información que falta solicitar antes de implementar `jsonAnswers`
+## Validaciones todavía pendientes con VisitTrack
 
-Copiar estas preguntas al responsable de Visitrack:
+El endpoint de detalle y sus parámetros ya están identificados. Antes de cerrar el contrato productivo
+solo falta confirmar con una respuesta completa y pruebas controladas:
 
-1. ¿Cuál es la URL y el método del endpoint que lista actividades/respuestas individuales?
-2. ¿Acepta múltiples SurveyID o requiere una llamada por formulario?
-3. ¿Cómo se solicita incluir todos los estados, especialmente activos y eliminados?
-4. ¿Qué campos contienen `jsonAnswers`, SurveyID, UserID, LocationID, AssetID, estado y timestamps?
-5. ¿Cuál es la semántica/zona horaria de `from` y `to`, y el final del rango es inclusivo?
-6. ¿Cómo funciona la paginación (cursor/page/limit), qué límites y rate limits existen y cuál es el
-   orden estable?
-7. ¿Qué autenticación requiere y cómo se rotan las credenciales?
-8. ¿Existe un endpoint agregado usuario → location o esa relación solo puede obtenerse desde cada
-   actividad individual?
+1. Los nombres exactos de metadata de cada actividad: SurveyID, UserID, LocationID, AssetID, estado y
+   timestamps.
+2. Si `CompanyStatusID=` incluye actividades físicamente eliminadas o si requieren otra consulta.
+3. La zona horaria de `from`/`to`, la inclusividad del límite final y su precisión real.
+4. El volumen máximo admitido, timeouts y posibles rate limits no documentados.
+5. Si existe algún mecanismo de paginación no observado y si el proveedor garantiza algún orden.
+6. El contrato completo de Assets cuando una compañía devuelva un catálogo no vacío.
+7. Si la API añadirá autenticación en el futuro; actualmente los endpoints observados son públicos,
+   pero deben seguir encapsulados exclusivamente en el backend.

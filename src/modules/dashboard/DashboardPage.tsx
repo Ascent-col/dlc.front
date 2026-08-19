@@ -30,7 +30,10 @@ import { useSelector } from 'react-redux';
 import HeaderComponent from '@/commons/header';
 import { RootState } from '@/store/store';
 import useAuth from '@/modules/auth/hooks/useAuth';
-import { dashboardSurveys } from './dashboard.mock';
+import {
+  dashboardLocationsWithoutActivity,
+  dashboardSurveys,
+} from './dashboard.mock';
 import styles from './dashboard.module.scss';
 
 const { Content } = Layout;
@@ -368,13 +371,13 @@ const DashboardPage = () => {
                     </div>
                     <div>
                       <Typography.Title level={5}>
-                        Locations sin actividad
+                        Locations sin actividad en la selección
                       </Typography.Title>
                       <Table
                         size="small"
                         pagination={false}
                         rowKey="id"
-                        dataSource={detailSurvey.locationsWithoutActivity}
+                        dataSource={dashboardLocationsWithoutActivity}
                         columns={[
                           { title: 'LocationID', dataIndex: 'id' },
                           { title: 'Location', dataIndex: 'name' },

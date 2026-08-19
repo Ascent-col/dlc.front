@@ -21,7 +21,6 @@ import {
   BellOutlined,
   ExclamationCircleFilled,
   HistoryOutlined,
-  DashboardOutlined,
 } from '@ant-design/icons';
 import { Alert, User } from '@/types';
 import Image from 'next/image';
@@ -247,9 +246,9 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
           </Col>
 
           {user?.role === 1 && (
-            <Col flex="1 1 auto">
-              <Row justify="start">
-                <Col span={12}>
+            <Col flex="1 1 auto" className="app-header__navigation">
+              <Row justify="start" style={{ height: '100%' }}>
+                <Col span={8}>
                   <Button
                     type="default"
                     size="large"
@@ -259,7 +258,7 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
                     Mapas
                   </Button>
                 </Col>
-                <Col span={12}>
+                <Col span={8}>
                   <Button
                     type="default"
                     size="large"
@@ -269,16 +268,25 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
                     Administrar
                   </Button>
                 </Col>
+                <Col span={8}>
+                  <Button
+                    type="default"
+                    size="large"
+                    style={stylesButtons}
+                    onClick={() => push('/dashboard')}
+                  >
+                    Dashboard
+                  </Button>
+                </Col>
               </Row>
             </Col>
           )}
-          {(user?.role === 1 || user?.role === 2) && (
-            <Col flex="1 1 auto" className="app-header__dashboard-link">
+          {user?.role === 2 && (
+            <Col flex="1 1 auto" className="app-header__navigation">
               <Button
                 type="default"
                 size="large"
-                style={{ ...stylesButtons, width: '180px' }}
-                icon={<DashboardOutlined />}
+                style={stylesButtons}
                 onClick={() => push('/dashboard')}
               >
                 Dashboard

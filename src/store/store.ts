@@ -12,6 +12,7 @@ import { companyApi } from './api/companyApi';
 import { roleApi } from './api/roleApi';
 import { locationApi } from './api/locationApi';
 import { userApi } from './api/userApi';
+import { visitrackApi } from './api/visitrackApi';
 
 const IS_PRODUCTION = process.env.MODE === 'production';
 
@@ -23,6 +24,7 @@ const reducers = {
   [companyApi.reducerPath]: companyApi.reducer,
   [roleApi.reducerPath]: roleApi.reducer,
   [locationApi.reducerPath]: locationApi.reducer,
+  [visitrackApi.reducerPath]: visitrackApi.reducer,
 
   // users: userSliceReducer,
   // companies: companySliceReducer,
@@ -46,6 +48,7 @@ const apiMiddlewares = [
   roleApi.middleware,
   locationApi.middleware,
   userApi.middleware,
+  visitrackApi.middleware,
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

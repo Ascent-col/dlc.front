@@ -17,11 +17,12 @@ Este documento convierte las notas funcionales del dashboard en dos prompts list
 - `getSurveysActivityCounter` acepta múltiples SurveyID separados por comas en una sola petición.
   `count` puede ser menor al número solicitado, por lo que se debe reconciliar la respuesta por
   SurveyID y reportar los IDs omitidos sin inventar resultados.
-- `getActivitiesByFormIDAndUpdatedOnPDF` entrega actividades individuales y `jsonAnswers`, requiere
-  una petición por Survey y no tiene paginación confirmada. Debe reservarse para detalle o exportación,
-  nunca para recalcular estadísticas ya disponibles.
-- `LocationsSinActividad` y `AssetsSinActividad` pertenecen al nivel raíz del contador múltiple; no se
-  deben atribuir a un Survey particular.
+- El proveedor dispone de `getActivitiesByFormIDAndUpdatedOnPDF`, pero el contrato interno
+  `/integrations/visitrack/activity/answers` continúa reservado y responde 501. El frontend no debe
+  depender todavía de `jsonAnswers`.
+- El backend normaliza `LocationsSinActividad` y `AssetsSinActividad` dentro de cada resultado de
+  contador. Como sus elementos siguen tipados como `unknown`, el frontend los interpreta de forma
+  defensiva y no infiere relaciones usuario-location.
 - `getSurveysActivityStats` no recibe IDs de formularios; el filtrado de formularios seleccionados
   debe hacerse en nuestra capa de integración o en el frontend.
 - Los endpoints estadísticos usan `YYYY-MM-DD`; el detalle usa provisionalmente
@@ -227,17 +228,14 @@ Usa el prefijo/versionado real del proyecto. Los nombres siguientes expresan el 
      únicos de la selección a menos que el proveedor lo garantice.
 
 4. GET `/integrations/visitrack/activity/counters?surveyIds=1,2&from=YYYY-MM-DD&to=YYYY-MM-DD`
-   - Envía una sola petición al proveedor con los IDs positivos, deduplicados y separados por comas:
-     GET `https://services.visitrack.com/getSurveysActivityCounter?CompanyID={companyIdVt}&SurveyID={idsCsv}&from={from}&to={to}`.
-   - Trata siempre `response` como arreglo y mapea cada elemento por SurveyID; nunca utiliza
-     `response[0]` como supuesto contrato de Survey único.
+   - Recibe IDs positivos, deduplicados y separados por comas. Si se omiten, resuelve “Todos” en el
+     backend con límites de cantidad y concurrencia configurables.
    - Devuelve por Survey: SurveyID, Title, TotalActividades, TotalActivas, TotalEliminadas,
      ActividadesSinLocation, ActividadesSinAsset, Locations y Assets.
-   - Conserva `LocationsSinActividad` y `AssetsSinActividad` como colecciones globales de la respuesta,
-     fuera de los Surveys. No inventa una relación entre esos elementos y un Survey.
-   - `count` representa Surveys efectivamente devueltos, no IDs solicitados. La respuesta interna debe
-     incluir `requestedSurveyIds`, `returnedSurveyIds` y `missingSurveyIds` para hacer explícitas las
-     omisiones del proveedor. Una omisión no es por sí sola un fallo HTTP total.
+   - Conserva `LocationsSinActividad` y `AssetsSinActividad` dentro del resultado normalizado de cada
+     Survey, pero mantiene sus elementos como `unknown` hasta confirmar el payload real.
+   - Devuelve `{ data, errors, meta }`; el frontend siempre renderiza `data` y muestra una advertencia
+     no bloqueante cuando `meta.failed > 0`.
    - Normaliza IDs y contadores a tipos consistentes. Un Survey puede tener actividad y `Locations: []`
      o `Assets: []`; en ese caso se deben respetar ActividadesSinLocation/ActividadesSinAsset.
 
@@ -256,27 +254,10 @@ Usa el prefijo/versionado real del proyecto. Los nombres siguientes expresan el 
    - Normaliza al menos ID, Name, BaseStatusID, Color, IsCompleted, IsDeleted e IsDeviceEnabled.
    - El frontend usa ID como CompanyStatusID. Nunca hardcodear IDs porque dependen de la compañía.
 
-8. GET `/integrations/visitrack/activity/answers?surveyId=1&from=YYYY-MM-DD&to=YYYY-MM-DD&companyStatusId=&locationId=&assetId=`
-   - Consulta una vez por Survey:
-     GET `https://services.visitrack.com/getActivitiesByFormIDAndUpdatedOnPDF?CompanyID={companyIdVt}&SurveyID={surveyId}&from={fromDate}%2000:00&to={toDate}%2023:59&CompanyStatusID={companyStatusId}&LocationID={locationId}&AssetID={assetId}`.
-   - No se ha confirmado soporte de múltiples SurveyID, así que el contrato interno recibe uno solo.
-   - Los filtros opcionales vacíos significan “sin filtro”. Los IDs de estado se obtienen del catálogo.
-   - Modela `jsonAnswers` como `unknown`. Si llega como string, intenta parsearlo de forma segura y,
-     ante JSON inválido, conserva el valor original junto con un indicador de error; nunca impide
-     devolver las demás actividades.
-   - No inventar todavía nombres tipados para metadata de usuario, Location, Asset, estado o timestamps:
-     primero validarlos contra una respuesta completa real. Conservar campos desconocidos en un
-     payload externo aislado hasta completar el mapper.
-   - No existe paginación, límite, rate limit ni orden estable confirmados. Imponer un rango máximo
-     conservador configurable en nuestra API y devolver 413/422 antes de llamar al proveedor cuando
-     la consulta sea insegura. Si se necesita varios Surveys, usar un job/export asíncrono en lugar de
-     acumular respuestas grandes en memoria.
-   - Mantener provisionalmente 00:00 → 23:59 sin conversión UTC. Documentar que zona horaria e
-     inclusividad de `to` siguen pendientes de confirmación.
-   - `CompanyStatusID=` no aplica filtro explícito, pero aún debe verificarse si incluye registros
-     físicamente eliminados. No prometer “todos los estados” hasta validar ese comportamiento.
-   - Este endpoint solo se usa para detalle, inspección, agregación User → Location o exportación; no
-     se llama para KPIs, contadores ni gráficos ya cubiertos por stats/counters.
+8. GET `/integrations/visitrack/activity/answers`
+   - Endpoint reservado que actualmente responde 501.
+   - El frontend debe mostrar “Funcionalidad no disponible” y no construir vistas que dependan de
+     `jsonAnswers` hasta que el backend publique un contrato estable.
 
 CONTRATOS Y CÁLCULOS
 - Crear DTOs/types explícitos para request, respuesta del proveedor y respuesta normalizada; no usar
@@ -315,10 +296,9 @@ CRITERIOS DE ACEPTACIÓN
 - El frontend nunca envía ni conoce necesariamente el CompanyID externo para consultar estadísticas.
 - No existen CompanyID/SurveyID de ejemplo hardcodeados.
 - Los endpoints agregados y catálogos entregan contratos estables y tipados.
-- La selección múltiple genera una sola petición CSV y hace visibles los SurveyID solicitados que el
-  proveedor no devolvió.
-- El endpoint de detalle acepta un Survey, trata `jsonAnswers` como dinámico y limita consultas de
-  volumen inseguro.
+- La selección múltiple envía un CSV al backend y los fallos parciales permanecen visibles sin ocultar
+  los resultados exitosos.
+- El endpoint de detalle permanece marcado como no disponible mientras responda HTTP 501.
 - `companyIdVt` y su TODO de persistencia para Juan Mora quedan documentados en el punto indicado.
 ```
 

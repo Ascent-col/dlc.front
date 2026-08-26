@@ -7,7 +7,6 @@ import {
 } from '@/modules/dashboard/dashboard.types';
 import { visitrackApi } from '../api/visitrackApi';
 import { visitrackConf } from '../conf/visitrack.conf';
-import { mapCounter } from './visitrack.mapper';
 
 export const toVisitrackParams = ({
   from,
@@ -46,7 +45,6 @@ export const visitrackApiSlice = visitrackApi.injectEndpoints({
         method: 'GET',
         params: toVisitrackParams(filters),
       }),
-      transformResponse: mapCounter,
       providesTags: ['VisitrackActivity'],
     }),
   }),

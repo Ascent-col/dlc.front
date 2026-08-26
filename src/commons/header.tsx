@@ -248,7 +248,7 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
           {user?.role === 1 && (
             <Col flex="1 1 auto" className="app-header__navigation">
               <Row justify="start" style={{ height: '100%' }}>
-                <Col span={8}>
+                <Col span={12}>
                   <Button
                     type="default"
                     size="large"
@@ -258,7 +258,7 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
                     Mapas
                   </Button>
                 </Col>
-                <Col span={8}>
+                <Col span={12}>
                   <Button
                     type="default"
                     size="large"
@@ -266,16 +266,6 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
                     onClick={() => push('/admin')}
                   >
                     Administrar
-                  </Button>
-                </Col>
-                <Col span={8}>
-                  <Button
-                    type="default"
-                    size="large"
-                    style={stylesButtons}
-                    onClick={() => push('/dashboard')}
-                  >
-                    Dashboard
                   </Button>
                 </Col>
               </Row>

@@ -1,5 +1,9 @@
 .shell {
+  height: 100dvh;
   min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
   background: #f5f5f5;
 }
 .content {

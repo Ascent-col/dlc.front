@@ -246,8 +246,8 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
           </Col>
 
           {user?.role === 1 && (
-            <Col flex="1 1 auto">
-              <Row justify="start">
+            <Col flex="1 1 auto" className="app-header__navigation">
+              <Row justify="start" style={{ height: '100%' }}>
                 <Col span={12}>
                   <Button
                     type="default"
@@ -269,6 +269,18 @@ const HeaderComponent: FC<HeaderComponentProps> = ({
                   </Button>
                 </Col>
               </Row>
+            </Col>
+          )}
+          {user?.role === 2 && (
+            <Col flex="1 1 auto" className="app-header__navigation">
+              <Button
+                type="default"
+                size="large"
+                style={stylesButtons}
+                onClick={() => push('/dashboard')}
+              >
+                Dashboard
+              </Button>
             </Col>
           )}
           {historyAlert && (

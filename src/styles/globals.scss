@@ -267,6 +267,11 @@ input,
     width: auto !important;
   }
 
+  .app-header__navigation .ant-btn {
+    padding-inline: 8px;
+    font-size: 0.78rem;
+  }
+
   .admin-tabs > .ant-tabs-nav {
     width: 100% !important;
     margin-bottom: 0;
